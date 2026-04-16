@@ -1,36 +1,74 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# InterviewAI — Simulateur d'entretien IA
 
-## Getting Started
+Un outil d'entraînement aux entretiens qui simule un recruteur réel adapté au poste et à l'entreprise ciblée, avec feedback chirurgical à la fin.
 
-First, run the development server:
+## Stack
+
+- **Next.js 14** (App Router)
+- **Tailwind CSS** — palette noir/blanc/rouge
+- **Anthropic SDK** — modèle `claude-opus-4-5`
+- Pas de base de données (sessionStorage uniquement)
+
+## Lancement rapide
+
+### 1. Installer les dépendances
+
+```bash
+npm install
+```
+
+### 2. Configurer la clé API
+
+```bash
+cp .env.example .env.local
+```
+
+Ouvre `.env.local` et renseigne ta clé :
+
+```
+ANTHROPIC_API_KEY=sk-ant-...
+```
+
+> Récupère ta clé sur : https://console.anthropic.com/
+
+### 3. Démarrer en développement
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Ouvre http://localhost:3000
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Architecture
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+src/app/
+├── page.tsx              # Landing page
+├── upload/page.tsx       # Upload CV + offre
+├── interview/page.tsx    # Chat entretien
+├── debrief/page.tsx      # Rapport final
+└── api/
+    ├── analyze/route.ts  # Analyse CV + offre → profil recruteur
+    ├── chat/route.ts     # Conduit l'entretien
+    └── debrief/route.ts  # Génère le rapport structuré
+```
 
-## Learn More
+## Flux utilisateur
 
-To learn more about Next.js, take a look at the following resources:
+1. **Landing** → CTA "Commencer gratuitement"
+2. **Upload** → CV (PDF) + Offre (PDF/PNG/JPG) → analyse par Claude
+3. **Interview** → Chat avec un recruteur virtuel adapté au poste (8 questions max)
+4. **Debrief** → Score /100, analyse Q par Q, 3 corrections prioritaires
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Variables d'environnement
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Variable | Description |
+|---|---|
+| `ANTHROPIC_API_KEY` | Clé API Anthropic (obligatoire) |
 
-## Deploy on Vercel
+## Build production
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+```bash
+npm run build
+npm start
+```

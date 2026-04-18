@@ -64,7 +64,7 @@ export async function POST(req: NextRequest) {
     }
 
     const response = await client.messages.create({
-      model: "claude-opus-4-5",
+      model: "claude-sonnet-4-6",
       max_tokens: 1024,
       system: `Tu es un expert RH et recruteur. Analyse ce CV et cette offre d'emploi.
 Génère :
@@ -98,10 +98,13 @@ Réponds UNIQUEMENT en JSON valide, sans markdown ni backticks : { "profil_inter
 
     return NextResponse.json(parsed);
   } catch (err: unknown) {
-    console.error("[/api/analyze]", err);
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Erreur serveur" },
-      { status: 500 }
-    );
+    const message = err instanceof Error ? err.message : "Erreur serveur";
+    // Log détaillé en dev pour faciliter le diagnostic
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[/api/analyze] Détail erreur :", err);
+    } else {
+      console.error("[/api/analyze]", message);
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

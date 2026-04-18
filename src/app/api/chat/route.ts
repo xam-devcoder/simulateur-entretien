@@ -46,7 +46,7 @@ Règles absolues :
 - Sois professionnel mais créé une tension naturelle de recrutement`;
 
     const response = await client.messages.create({
-      model: "claude-opus-4-5",
+      model: "claude-sonnet-4-6",
       max_tokens: 512,
       system: systemPrompt,
       // Pass the full conversation history
@@ -63,10 +63,12 @@ Règles absolues :
 
     return NextResponse.json({ reply: content.text });
   } catch (err: unknown) {
-    console.error("[/api/chat]", err);
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Erreur serveur" },
-      { status: 500 }
-    );
+    const message = err instanceof Error ? err.message : "Erreur serveur";
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[/api/chat] Détail erreur :", err);
+    } else {
+      console.error("[/api/chat]", message);
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }

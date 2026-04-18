@@ -41,7 +41,7 @@ export async function POST(req: NextRequest) {
       .join("\n\n");
 
     const response = await client.messages.create({
-      model: "claude-opus-4-5",
+      model: "claude-sonnet-4-6",
       max_tokens: 2500,
       system: `Tu es un coach en entretien expert. Analyse cet entretien pour le poste : ${poste}.
 Recruteur : ${profil_intervieweur}.
@@ -82,10 +82,12 @@ Réponds UNIQUEMENT en JSON valide sans markdown :
 
     return NextResponse.json(report);
   } catch (err: unknown) {
-    console.error("[/api/debrief]", err);
-    return NextResponse.json(
-      { error: err instanceof Error ? err.message : "Erreur serveur" },
-      { status: 500 }
-    );
+    const message = err instanceof Error ? err.message : "Erreur serveur";
+    if (process.env.NODE_ENV !== "production") {
+      console.error("[/api/debrief] Détail erreur :", err);
+    } else {
+      console.error("[/api/debrief]", message);
+    }
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
